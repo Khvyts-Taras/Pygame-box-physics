@@ -27,7 +27,7 @@ class Rect:
 		if self.active:
 			self.mass = mass
 		else:
-			self.mass = 1e+10
+			self.mass = 10**3
 
 	def update(self):
 		self.vx *= 0.97
