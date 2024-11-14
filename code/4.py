@@ -10,7 +10,7 @@ clock = pygame.time.Clock()
 cam_x = 0
 cam_y = 0
 
-steps_per_frame = 1
+steps_per_frame = 4
 
 def collision(rect1, rect2):
 	x1, y1, w1, h1 = rect1.x, rect1.y, rect1.w, rect1.h
@@ -37,8 +37,10 @@ class Rect:
 		self.mass = mass
 
 	def update(self, dt=1):
-		self.vx *= 0.97
-		self.vy *= 0.97
+		self.vy += 0.5*dt
+
+		self.vx *= 0.97**dt
+		self.vy *= 0.97**dt
 
 		
 		if self.vx > 0:
@@ -147,8 +149,12 @@ def update_collisions(rect1, rect2):
 
 
 
+
+
+
+
 rects = [Rect(random.randint(0, window_size[0]), random.randint(0, window_size[1]), random.randint(20, 60), random.randint(20, 60)) for i in range(50)]
-walls = [Wall(200, 200, 150, 150), Wall(150, 20, 65, 44)]
+walls = [Wall(0, 600, 800, 50), Wall(150, 400, 150, 44)]
 
 
 start_drag_pos = None
@@ -181,6 +187,37 @@ while 1:
 		for rect1 in rects:
 			for rect2 in rects[rects.index(rect1)+1:]:
 				update_collisions(rect1, rect2)
+
+			for wall in walls:
+				if collision(wall, rect1):
+
+					if rect1.x+rect1.w/2 >= wall.x+wall.w/2:
+						x_overlap = wall.x + wall.w - rect1.x
+					else:
+						x_overlap = rect1.x + rect1.w - wall.x
+
+					if rect1.y+rect1.h/2 >= wall.y+wall.h/2:
+						y_overlap = wall.y + wall.h - rect1.y
+					else:
+						y_overlap = rect1.y + rect1.h - wall.y
+
+
+					if x_overlap < y_overlap:
+						if rect1.x+rect1.w/2 >= wall.x+wall.w/2:
+							rect1.x += x_overlap
+						else:
+							rect1.x -= x_overlap
+							
+						rect1.vx = 0
+
+					else:
+						if rect1.y+rect1.h/2 >= wall.y+wall.h/2:
+							rect1.y += y_overlap
+						else:
+							rect1.y -= y_overlap
+
+						rect1.vy = 0
+
 
 
 
